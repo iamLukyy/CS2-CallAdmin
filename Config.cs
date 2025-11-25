@@ -46,6 +46,12 @@ public class MessagesConfig
 
     [JsonPropertyName("UseSlashEn")]
     public string UseSlashEn { get; set; } = "Use /calladmin instead of !calladmin";
+
+    [JsonPropertyName("NoLinks")]
+    public string NoLinks { get; set; } = "Nelze posílat odkazy! Napiš důvod bez URL.";
+
+    [JsonPropertyName("NoLinksEn")]
+    public string NoLinksEn { get; set; } = "Links are not allowed! Write the reason without URL.";
 }
 
 public class CallAdminConfig : BasePluginConfig

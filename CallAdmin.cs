@@ -5,13 +5,14 @@ using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Modules.Cvars;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace CallAdmin;
 
 public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
 {
     public override string ModuleName => "CallAdmin";
-    public override string ModuleVersion => "1.0.1";
+    public override string ModuleVersion => "1.0.2";
     public override string ModuleAuthor => "Luky";
     public override string ModuleDescription => "Call admin system with Discord/API integration";
 
@@ -89,6 +90,15 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
         {
             string noReasonMsg = GetMessage("NoReason");
             player.PrintToChat($" {ChatColors.Red}{Config.ChatPrefix}{ChatColors.Default} {noReasonMsg}");
+            return;
+        }
+
+        // Check for URLs/links in the message
+        if (ContainsUrl(args))
+        {
+            string noLinksMsg = GetMessage("NoLinks");
+            player.PrintToChat($" {ChatColors.Red}{Config.ChatPrefix}{ChatColors.Default} {noLinksMsg}");
+            Console.WriteLine($"[CallAdmin] Blocked link attempt from {player.PlayerName}: {args}");
             return;
         }
 
@@ -171,6 +181,30 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
         return false;
     }
 
+    private bool ContainsUrl(string text)
+    {
+        string lowerText = text.ToLower();
+
+        // Check for common URL patterns
+        string[] urlPatterns = {
+            "http://", "https://", "www.", "ftp://",
+            ".com", ".cz", ".net", ".org", ".eu", ".sk", ".de", ".ru", ".io", ".gg", ".tv", ".me",
+            ".info", ".biz", ".co", ".xyz", ".online", ".site", ".website", ".link", ".click"
+        };
+
+        foreach (var pattern in urlPatterns)
+        {
+            if (lowerText.Contains(pattern))
+                return true;
+        }
+
+        // Regex for more complex URL detection (handles things like "google(dot)com")
+        var urlRegex = new Regex(@"[a-zA-Z0-9]+([\.\(\[]+(dot|tečka|tecka|bod)[\.\)\]]+)?[a-zA-Z0-9]*[\.\(\[](com|cz|net|org|eu|sk|de|ru|io|gg|tv|me|info|biz|co|xyz)[\)\]]?",
+            RegexOptions.IgnoreCase);
+
+        return urlRegex.IsMatch(text);
+    }
+
     private CCSPlayerController? FindPlayerByName(string partialName)
     {
         var players = Utilities.GetPlayers()
@@ -204,6 +238,7 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
             "ReportFailed" => isEnglish ? Config.Messages.ReportFailedEn : Config.Messages.ReportFailed,
             "ReportWithTarget" => isEnglish ? Config.Messages.ReportWithTargetEn : Config.Messages.ReportWithTarget,
             "UseSlash" => isEnglish ? Config.Messages.UseSlashEn : Config.Messages.UseSlash,
+            "NoLinks" => isEnglish ? Config.Messages.NoLinksEn : Config.Messages.NoLinks,
             _ => key
         };
     }
