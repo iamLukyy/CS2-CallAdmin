@@ -40,9 +40,9 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
         AddCommandListener("say", OnPlayerChat);
         AddCommandListener("say_team", OnPlayerChat);
 
-        // Console commands
-        AddCommand("css_calladmin", "Call an admin for help", OnConsoleCommand);
-        AddCommand("css_report", "Report a player (alias for calladmin)", OnConsoleCommand);
+        // Console commands (without css_ prefix)
+        AddCommand("calladmin", "Call an admin for help", OnConsoleCommand);
+        AddCommand("report", "Report a player (alias for calladmin)", OnConsoleCommand);
 
         Console.WriteLine($"[CallAdmin] Server: {Config.ServerName}, Language: {Config.Language}");
     }
