@@ -11,7 +11,7 @@ namespace CallAdmin;
 public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
 {
     public override string ModuleName => "CallAdmin";
-    public override string ModuleVersion => "1.0.0";
+    public override string ModuleVersion => "1.0.1";
     public override string ModuleAuthor => "Luky";
     public override string ModuleDescription => "Call admin system with Discord/API integration";
 
@@ -35,8 +35,9 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
     {
         Console.WriteLine($"[CallAdmin] Plugin v{ModuleVersion} loaded!");
 
-        // Register the calladmin command
-        AddCommand("css_calladmin", "Call an admin for help", OnCallAdminCommand);
+        // Listen to chat messages to detect !calladmin vs /calladmin
+        AddCommandListener("say", OnPlayerChat);
+        AddCommandListener("say_team", OnPlayerChat);
 
         Console.WriteLine($"[CallAdmin] Server: {Config.ServerName}, Language: {Config.Language}");
     }
@@ -46,12 +47,35 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
         Console.WriteLine("[CallAdmin] Plugin unloaded.");
     }
 
-    [CommandHelper(minArgs: 1, usage: "<reason> or @<player> <reason>", whoCanExecute: CommandUsage.CLIENT_ONLY)]
-    private void OnCallAdminCommand(CCSPlayerController? player, CommandInfo command)
+    private HookResult OnPlayerChat(CCSPlayerController? player, CommandInfo command)
     {
         if (player == null || !player.IsValid)
-            return;
+            return HookResult.Continue;
 
+        string message = command.GetArg(1).Trim();
+
+        // Check for !calladmin (wrong usage)
+        if (message.StartsWith("!calladmin", StringComparison.OrdinalIgnoreCase))
+        {
+            string useSlashMsg = GetMessage("UseSlash");
+            player.PrintToChat($" {ChatColors.Yellow}{Config.ChatPrefix}{ChatColors.Default} {useSlashMsg}");
+            return HookResult.Continue;
+        }
+
+        // Check for /calladmin (correct usage)
+        if (message.StartsWith("/calladmin", StringComparison.OrdinalIgnoreCase))
+        {
+            // Extract arguments after /calladmin
+            string args = message.Length > 10 ? message.Substring(10).Trim() : "";
+            ProcessCallAdmin(player, args);
+            return HookResult.Handled; // Don't show /calladmin in chat
+        }
+
+        return HookResult.Continue;
+    }
+
+    private void ProcessCallAdmin(CCSPlayerController player, string args)
+    {
         // Check cooldown
         if (IsOnCooldown(player.SteamID, out int remainingSeconds))
         {
@@ -60,21 +84,8 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
             return;
         }
 
-        // Get the full argument string
-        string fullArgs = command.GetCommandString;
-
-        // Remove the command itself from the string
-        int firstSpace = fullArgs.IndexOf(' ');
-        if (firstSpace == -1)
-        {
-            string noReasonMsg = GetMessage("NoReason");
-            player.PrintToChat($" {ChatColors.Red}{Config.ChatPrefix}{ChatColors.Default} {noReasonMsg}");
-            return;
-        }
-
-        string argsOnly = fullArgs.Substring(firstSpace + 1).Trim();
-
-        if (string.IsNullOrWhiteSpace(argsOnly))
+        // Check if reason provided
+        if (string.IsNullOrWhiteSpace(args))
         {
             string noReasonMsg = GetMessage("NoReason");
             player.PrintToChat($" {ChatColors.Red}{Config.ChatPrefix}{ChatColors.Default} {noReasonMsg}");
@@ -83,12 +94,12 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
 
         // Check if first argument starts with @ (target player)
         CCSPlayerController? targetPlayer = null;
-        string reason = argsOnly;
+        string reason = args;
 
-        if (argsOnly.StartsWith("@"))
+        if (args.StartsWith("@"))
         {
             // Parse @player mention
-            string[] parts = argsOnly.Split(' ', 2);
+            string[] parts = args.Split(' ', 2);
             string targetName = parts[0].Substring(1); // Remove @
 
             if (string.IsNullOrWhiteSpace(targetName))
@@ -109,9 +120,9 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
             }
 
             // Get reason (everything after @player)
-            reason = parts.Length > 1 ? parts[1].Trim() : "No reason specified";
+            reason = parts.Length > 1 ? parts[1].Trim() : "";
 
-            if (string.IsNullOrWhiteSpace(reason) || reason == "No reason specified")
+            if (string.IsNullOrWhiteSpace(reason))
             {
                 reason = Config.Language == "cs" ? "Bez udání důvodu" : "No reason specified";
             }
@@ -192,6 +203,7 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
             "PlayerNotFound" => isEnglish ? Config.Messages.PlayerNotFoundEn : Config.Messages.PlayerNotFound,
             "ReportFailed" => isEnglish ? Config.Messages.ReportFailedEn : Config.Messages.ReportFailed,
             "ReportWithTarget" => isEnglish ? Config.Messages.ReportWithTargetEn : Config.Messages.ReportWithTarget,
+            "UseSlash" => isEnglish ? Config.Messages.UseSlashEn : Config.Messages.UseSlash,
             _ => key
         };
     }

@@ -18,10 +18,10 @@ public class MessagesConfig
     public string OnCooldownEn { get; set; } = "You must wait {seconds} seconds before next report.";
 
     [JsonPropertyName("NoReason")]
-    public string NoReason { get; set; } = "Musíš zadat důvod! Použití: !calladmin <důvod>";
+    public string NoReason { get; set; } = "Musíš zadat důvod! Použití: /calladmin <důvod>";
 
     [JsonPropertyName("NoReasonEn")]
-    public string NoReasonEn { get; set; } = "You must provide a reason! Usage: !calladmin <reason>";
+    public string NoReasonEn { get; set; } = "You must provide a reason! Usage: /calladmin <reason>";
 
     [JsonPropertyName("PlayerNotFound")]
     public string PlayerNotFound { get; set; } = "Hráč '{name}' nebyl nalezen.";
@@ -40,6 +40,12 @@ public class MessagesConfig
 
     [JsonPropertyName("ReportWithTargetEn")]
     public string ReportWithTargetEn { get; set; } = "You reported player {target}: {reason}";
+
+    [JsonPropertyName("UseSlash")]
+    public string UseSlash { get; set; } = "Používej /calladmin místo !calladmin";
+
+    [JsonPropertyName("UseSlashEn")]
+    public string UseSlashEn { get; set; } = "Use /calladmin instead of !calladmin";
 }
 
 public class CallAdminConfig : BasePluginConfig
