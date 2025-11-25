@@ -1,0 +1,67 @@
+using CounterStrikeSharp.API.Core;
+using System.Text.Json.Serialization;
+
+namespace CallAdmin;
+
+public class MessagesConfig
+{
+    [JsonPropertyName("ReportSent")]
+    public string ReportSent { get; set; } = "Report byl úspěšně odeslán!";
+
+    [JsonPropertyName("ReportSentEn")]
+    public string ReportSentEn { get; set; } = "Report has been sent successfully!";
+
+    [JsonPropertyName("OnCooldown")]
+    public string OnCooldown { get; set; } = "Musíš počkat {seconds} sekund před dalším reportem.";
+
+    [JsonPropertyName("OnCooldownEn")]
+    public string OnCooldownEn { get; set; } = "You must wait {seconds} seconds before next report.";
+
+    [JsonPropertyName("NoReason")]
+    public string NoReason { get; set; } = "Musíš zadat důvod! Použití: !calladmin <důvod>";
+
+    [JsonPropertyName("NoReasonEn")]
+    public string NoReasonEn { get; set; } = "You must provide a reason! Usage: !calladmin <reason>";
+
+    [JsonPropertyName("PlayerNotFound")]
+    public string PlayerNotFound { get; set; } = "Hráč '{name}' nebyl nalezen.";
+
+    [JsonPropertyName("PlayerNotFoundEn")]
+    public string PlayerNotFoundEn { get; set; } = "Player '{name}' not found.";
+
+    [JsonPropertyName("ReportFailed")]
+    public string ReportFailed { get; set; } = "Nepodařilo se odeslat report. Zkus to znovu.";
+
+    [JsonPropertyName("ReportFailedEn")]
+    public string ReportFailedEn { get; set; } = "Failed to send report. Please try again.";
+
+    [JsonPropertyName("ReportWithTarget")]
+    public string ReportWithTarget { get; set; } = "Nahlásil jsi hráče {target}: {reason}";
+
+    [JsonPropertyName("ReportWithTargetEn")]
+    public string ReportWithTargetEn { get; set; } = "You reported player {target}: {reason}";
+}
+
+public class CallAdminConfig : BasePluginConfig
+{
+    [JsonPropertyName("ServerName")]
+    public string ServerName { get; set; } = "CS2 Server";
+
+    [JsonPropertyName("ApiUrl")]
+    public string ApiUrl { get; set; } = "http://46.36.40.132:5561/api/calladmin";
+
+    [JsonPropertyName("ApiKey")]
+    public string ApiKey { get; set; } = "gs_calladmin_2024";
+
+    [JsonPropertyName("CooldownSeconds")]
+    public int CooldownSeconds { get; set; } = 60;
+
+    [JsonPropertyName("ChatPrefix")]
+    public string ChatPrefix { get; set; } = "[CallAdmin]";
+
+    [JsonPropertyName("Language")]
+    public string Language { get; set; } = "cs"; // "cs" or "en"
+
+    [JsonPropertyName("Messages")]
+    public MessagesConfig Messages { get; set; } = new();
+}
