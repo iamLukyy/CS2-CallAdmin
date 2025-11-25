@@ -12,7 +12,7 @@ namespace CallAdmin;
 public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
 {
     public override string ModuleName => "CallAdmin";
-    public override string ModuleVersion => "1.0.4";
+    public override string ModuleVersion => "1.0.5";
     public override string ModuleAuthor => "Luky";
     public override string ModuleDescription => "Call admin system with Discord/API integration";
 
@@ -40,6 +40,10 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
         AddCommandListener("say", OnPlayerChat);
         AddCommandListener("say_team", OnPlayerChat);
 
+        // Console commands
+        AddCommand("css_calladmin", "Call an admin for help", OnConsoleCommand);
+        AddCommand("css_report", "Report a player (alias for calladmin)", OnConsoleCommand);
+
         Console.WriteLine($"[CallAdmin] Server: {Config.ServerName}, Language: {Config.Language}");
     }
 
@@ -55,8 +59,9 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
 
         string message = command.GetArg(1).Trim();
 
-        // Check for !calladmin (wrong usage)
-        if (message.StartsWith("!calladmin", StringComparison.OrdinalIgnoreCase))
+        // Check for !calladmin or !report (wrong usage)
+        if (message.StartsWith("!calladmin", StringComparison.OrdinalIgnoreCase) ||
+            message.StartsWith("!report", StringComparison.OrdinalIgnoreCase))
         {
             string useSlashMsg = GetMessage("UseSlash");
             player.PrintToChat($" {ChatColors.Yellow}{Config.ChatPrefix}{ChatColors.Default} {useSlashMsg}");
@@ -66,13 +71,36 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
         // Check for /calladmin (correct usage)
         if (message.StartsWith("/calladmin", StringComparison.OrdinalIgnoreCase))
         {
-            // Extract arguments after /calladmin
             string args = message.Length > 10 ? message.Substring(10).Trim() : "";
             ProcessCallAdmin(player, args);
-            return HookResult.Handled; // Don't show /calladmin in chat
+            return HookResult.Handled;
+        }
+
+        // Check for /report (alias)
+        if (message.StartsWith("/report", StringComparison.OrdinalIgnoreCase))
+        {
+            string args = message.Length > 7 ? message.Substring(7).Trim() : "";
+            ProcessCallAdmin(player, args);
+            return HookResult.Handled;
         }
 
         return HookResult.Continue;
+    }
+
+    private void OnConsoleCommand(CCSPlayerController? player, CommandInfo command)
+    {
+        if (player == null || !player.IsValid)
+            return;
+
+        // Get all arguments after the command
+        string args = "";
+        for (int i = 1; i < command.ArgCount; i++)
+        {
+            args += command.GetArg(i) + " ";
+        }
+        args = args.Trim();
+
+        ProcessCallAdmin(player, args);
     }
 
     private void ProcessCallAdmin(CCSPlayerController player, string args)

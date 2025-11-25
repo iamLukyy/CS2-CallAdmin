@@ -42,10 +42,10 @@ public class MessagesConfig
     public string ReportWithTargetEn { get; set; } = "You reported player {target}: {reason}";
 
     [JsonPropertyName("UseSlash")]
-    public string UseSlash { get; set; } = "Používej /calladmin místo !calladmin";
+    public string UseSlash { get; set; } = "Používej /calladmin nebo /report místo !";
 
     [JsonPropertyName("UseSlashEn")]
-    public string UseSlashEn { get; set; } = "Use /calladmin instead of !calladmin";
+    public string UseSlashEn { get; set; } = "Use /calladmin or /report instead of !";
 
     [JsonPropertyName("NoLinks")]
     public string NoLinks { get; set; } = "Nelze posílat odkazy! Napiš důvod bez URL.";
