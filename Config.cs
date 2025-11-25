@@ -48,10 +48,10 @@ public class CallAdminConfig : BasePluginConfig
     public string ServerName { get; set; } = "CS2 Server";
 
     [JsonPropertyName("ApiUrl")]
-    public string ApiUrl { get; set; } = "http://46.36.40.132:5561/api/calladmin";
+    public string ApiUrl { get; set; } = "http://your-api-endpoint/api/calladmin";
 
     [JsonPropertyName("ApiKey")]
-    public string ApiKey { get; set; } = "gs_calladmin_2024";
+    public string ApiKey { get; set; } = "your_api_key_here";
 
     [JsonPropertyName("CooldownSeconds")]
     public int CooldownSeconds { get; set; } = 60;
