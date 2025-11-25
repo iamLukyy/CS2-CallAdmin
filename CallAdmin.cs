@@ -12,7 +12,7 @@ namespace CallAdmin;
 public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
 {
     public override string ModuleName => "CallAdmin";
-    public override string ModuleVersion => "1.0.2";
+    public override string ModuleVersion => "1.0.4";
     public override string ModuleAuthor => "Luky";
     public override string ModuleDescription => "Call admin system with Discord/API integration";
 
@@ -185,24 +185,39 @@ public class CallAdmin : BasePlugin, IPluginConfig<CallAdminConfig>
     {
         string lowerText = text.ToLower();
 
+        Console.WriteLine($"[CallAdmin] URL Check: '{text}'");
+
+        // Simple check for // followed by anything
+        if (lowerText.Contains("//"))
+        {
+            Console.WriteLine("[CallAdmin] Blocked: contains //");
+            return true;
+        }
+
         // Check for common URL patterns
         string[] urlPatterns = {
-            "http://", "https://", "www.", "ftp://",
+            "http:", "https:", "www.", "ftp:",
             ".com", ".cz", ".net", ".org", ".eu", ".sk", ".de", ".ru", ".io", ".gg", ".tv", ".me",
-            ".info", ".biz", ".co", ".xyz", ".online", ".site", ".website", ".link", ".click"
+            ".info", ".biz", ".xyz", ".online", ".site", ".website", ".link", ".click", ".gy", ".ly"
         };
 
         foreach (var pattern in urlPatterns)
         {
             if (lowerText.Contains(pattern))
+            {
+                Console.WriteLine($"[CallAdmin] Blocked: contains {pattern}");
                 return true;
+            }
         }
 
-        // Regex for more complex URL detection (handles things like "google(dot)com")
-        var urlRegex = new Regex(@"[a-zA-Z0-9]+([\.\(\[]+(dot|tečka|tecka|bod)[\.\)\]]+)?[a-zA-Z0-9]*[\.\(\[](com|cz|net|org|eu|sk|de|ru|io|gg|tv|me|info|biz|co|xyz)[\)\]]?",
-            RegexOptions.IgnoreCase);
+        // Detect URL shorteners pattern: word.2-4chars/something (rb.gy/xxx, bit.ly/xxx)
+        if (Regex.IsMatch(lowerText, @"[a-z0-9]+\.[a-z]{2,4}/"))
+        {
+            Console.WriteLine("[CallAdmin] Blocked: shortener pattern");
+            return true;
+        }
 
-        return urlRegex.IsMatch(text);
+        return false;
     }
 
     private CCSPlayerController? FindPlayerByName(string partialName)
