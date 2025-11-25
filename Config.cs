@@ -18,10 +18,10 @@ public class MessagesConfig
     public string OnCooldownEn { get; set; } = "You must wait {seconds} seconds before next report.";
 
     [JsonPropertyName("NoReason")]
-    public string NoReason { get; set; } = "Musíš zadat důvod! Použití: /calladmin <důvod>";
+    public string NoReason { get; set; } = "Použití: /calladmin <důvod> | /calladmin @hráč | /calladmin @hráč <důvod>";
 
     [JsonPropertyName("NoReasonEn")]
-    public string NoReasonEn { get; set; } = "You must provide a reason! Usage: /calladmin <reason>";
+    public string NoReasonEn { get; set; } = "Usage: /calladmin <reason> | /calladmin @player | /calladmin @player <reason>";
 
     [JsonPropertyName("PlayerNotFound")]
     public string PlayerNotFound { get; set; } = "Hráč '{name}' nebyl nalezen.";
